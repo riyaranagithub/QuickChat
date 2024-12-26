@@ -10,9 +10,11 @@ const verifyToken = (req, res, next) => {
 
   try {
     // Verify the token
-    const decoded = jwt.verify(token, "Riya@Tinder"); // Replace with your secret key
-    req.user = decoded; // Add decoded user data to the request
-    next();
+    const decoded = jwt.verify(token, process.env.JWT_SECRET); // Replace with your secret key
+    if(decoded){
+      next();
+    }
+    
   } catch (error) {
     if (error.name === "TokenExpiredError") {
       return res.status(403).json({ message: "Token expired. Please login again." });

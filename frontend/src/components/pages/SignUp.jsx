@@ -1,7 +1,6 @@
 import React, { useState } from "react";
 import { Link,useNavigate } from "react-router-dom";
 
-
 const SignUp = () => {
   const [formData, setFormData] = useState({
     username: "",
@@ -42,7 +41,7 @@ const SignUp = () => {
       console.log(`${key}:`, value);
     }
     try {
-      const response = await fetch("http://localhost:3000/signup", {
+      const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/auth/signup`, {
         method: "POST",
         body: formDataObj,
         credentials: "include" // Send FormData as the request body

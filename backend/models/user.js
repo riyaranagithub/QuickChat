@@ -2,6 +2,9 @@ import mongoose from "mongoose";
 import validator from "validator";
 import jwt from "jsonwebtoken";
 import bcrypt from "bcrypt";
+import dotenv from "dotenv";
+
+dotenv.config();
 
 const userSchema = new mongoose.Schema({
   username: {
@@ -63,7 +66,7 @@ const userSchema = new mongoose.Schema({
 
 userSchema.methods.getJwt= function () {
   const user=this;
-   const token = jwt.sign({ _id: user._id }, "Riya@Tinder", { expiresIn: '1h' });
+   const token = jwt.sign({ _id: user._id }, process.env.JWT_SECRET, { expiresIn: '1h' });
    return token;
   
 }
@@ -74,10 +77,10 @@ userSchema.methods.validatePassword = async function(password){
 }
 
 const messageSchema = new mongoose.Schema({
-  sender: String,
-  receiver:String,
+  senderId: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
+  receiverId: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
   content: String,
-  timestamp: { type: Date, default: Date.now },
+  createdAt: { type: Date, default: Date.now },
 });
 
 

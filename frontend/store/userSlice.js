@@ -12,7 +12,8 @@ const userSlice = createSlice({
     login: (state, action) => {
       console.log("Reducer received:", action.payload);
       state.user =  {
-        username: action.payload.username, // Save username
+        username: action.payload.username,
+        _id:action.payload._id, // Save username
         token: action.payload.token,       // Save token
       };
       state.isLoggedIn = true;

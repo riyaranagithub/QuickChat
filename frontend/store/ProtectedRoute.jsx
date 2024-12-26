@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from "react";
 import { Navigate, useNavigate } from "react-router-dom";
-import { Link } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import { login } from "./userSlice";
 
@@ -10,13 +9,18 @@ const ProtectedRoute = ({ children }) => {
   const [isLoading, setIsLoading] = useState(true);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const navigate = useNavigate();
-
+  const userId = sessionStorage.getItem('userId'); 
   useEffect(() => {
     const checkLoginStatus = async () => {
       try {
-        const response = await fetch("http://localhost:3000/profile", {
-          method: "GET",
+        const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/profile/profile`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ userId }),
           credentials: "include",
+
         });
 
         if (response.ok) {

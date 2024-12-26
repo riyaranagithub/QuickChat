@@ -1,33 +1,41 @@
 import React, { useEffect, useState } from "react";
 import { FaCamera, FaUserCircle } from "react-icons/fa";
 
+
 const EditProfile = () => {
   const [isEditing, setIsEditing] = useState(false);
   const [formData, setFormData] = useState({
+    _id:"",
     username: "",
     about: "",
     profileImage: "",
     memberSince: "", // Added for account information
   });
   const [loading, setLoading] = useState(true);
-
+  const userId = sessionStorage.getItem('userId'); // Retrieve user ID
   // Fetch profile data
   useEffect(() => {
     const fetchProfile = async () => {
       try {
-        const response = await fetch("http://localhost:3000/profile", {
-          method: "GET",
+        const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/profile/profile`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ userId }),
           credentials: "include",
         });
 
         if (response.ok) {
           const data = await response.json();
+          console.log(data)
           const formattedDate = new Date(data.user.createdAt).toLocaleDateString(
             "en-GB" // This is the format "DD/MM/YYYY"
           );
-          const imageUrl = data.user.profileImage ? `http://localhost:3000/${data.user.profileImage.replace(/\\/g, '/')}` : "";
+          const imageUrl = data.user.profileImage ? `${import.meta.env.BACKEND_URL}/${data.user.profileImage.replace(/\\/g, '/')}` : "";
     
           setFormData({
+            _id:data.user._id||"",
             username: data.user.username || "",
             about: data.user.about || "",
             profileImage: imageUrl || "",
@@ -80,17 +88,17 @@ const EditProfile = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsEditing(false);
-
+    console.log("form data",formData)
     try {
-      const response = await fetch("http://localhost:3000/updateProfile", {
-        method: "PATCH",
+      const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/profile/updateProfile`, {
+        method: "PUT",
         headers: {
           "Content-Type": "application/json",
         },
         body: JSON.stringify(formData),
         credentials: "include",
       });
-
+console.log("form data",formData)
       if (response.ok) {
         const result = await response.json();
         console.log("Profile updated successfully", result);
@@ -99,6 +107,7 @@ const EditProfile = () => {
       }
     } catch (error) {
       console.error("Something went wrong", error);
+      alert("Something went wrong. Please try again.");
     }
   };
 

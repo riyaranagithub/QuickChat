@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import { login } from "../../../store/userSlice"; // Make sure to import your login action
@@ -13,11 +13,14 @@ const Login = () => {
   });
   const [errorMessage, setErrorMessage] = useState("");
 
+
   const handleSubmit = async (e) => {
+   
     e.preventDefault();
 
     try {
-      const loginResponse = await fetch("http://localhost:3000/login", {
+      console.log("Backend URL:", import.meta.env.VITE_BACKEND_URL);
+      const loginResponse = await fetch(`${import.meta.env.VITE_BACKEND_URL}/auth/login`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -27,13 +30,17 @@ const Login = () => {
       });
 
       const loginResult = await loginResponse.json();
-
-      if (!loginResponse.ok) {
-        // Handle error response from backend
+      console.log("Login Result:", loginResult);
+      if (loginResponse.status === 200) {
+        sessionStorage.setItem('userId', loginResult.user._id); // Store user ID
+        console.log('Login successful:', loginResult.message);
+      } else {
         setErrorMessage(loginResult.message || "Invalid login credentials");
-        return;
+        console.log('Login failed:', data.message);
       }
 
+  
+     
       // If login is successful, dispatch the login action
       dispatch(login(loginResult.user)); // Pass user data to the Redux store
 
