@@ -18,7 +18,7 @@ const app = express();
 const server = createServer(app); // Use Express app with HTTP server
 const io = new Server(server); // Initialize Socket.IO with HTTP server
 
-
+const port = process.env.PORT || 3000;
 
 // Parse incoming JSON and cookies
 app.use(express.json());
@@ -98,7 +98,7 @@ io.on("connection", (socket) => {
 connectDB()
   .then(() => {
     console.log("Database connected successfully");
-    server.listen(process.env.PORT, () => {
+    server.listen(port, () => {
       console.log("Server is running on port 3000");
       console.log("Frontend URL:", process.env.FRONTEND_URL);
 
