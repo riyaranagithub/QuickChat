@@ -22,7 +22,7 @@ const port = process.env.PORT || 3000;
 app.use(express.json());
 app.use(cookieParser());
 // Explicitly handle OPTIONS requests
-app.options("*", (req, res) => {
+app.options(process.env.FRONTEND_URL, (req, res) => {
   console.log("Middleware running");
   console.log("Preflight request");
   res.setHeader("Access-Control-Allow-Origin", process.env.FRONTEND_URL);

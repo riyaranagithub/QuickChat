@@ -19,36 +19,42 @@ const SignUp = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const formDataObj = new FormData(); // Use FormData for file uploads
-    formDataObj.append("username", formData.username);
-    formDataObj.append("email", formData.email);
-    formDataObj.append("password", formData.password);
-    formDataObj.append("about", formData.about);
-
-    for (let [key, value] of formDataObj.entries()) {
-      console.log(`${key}:`, value);
-    }
+  
+    const { about, ...otherFields } = formData;
+  
+    // Prepare payload, excluding empty 'about'
+    const payload = {
+      ...otherFields,
+      ...(about && about.trim() ? { about } : {}),
+    };
+  
     try {
       const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/auth/signup`, {
         method: "POST",
-        body: formDataObj,
-        credentials: "include", // Send FormData as the request body
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(payload),
+        credentials: "include",
       });
-
+  
       const result = await response.json();
       console.log("Signup response:", result);
+  
       if (response.ok) {
+        sessionStorage.setItem("userId", result.user._id);
         console.log("Signup successful:", result);
         navigate("/");
       } else {
-        console.error("Signup error:", result.errors);
-        setErrors(result.errors || {});
+        console.error("Signup error:", result.message);
+        setErrors({ message: result.message });
       }
     } catch (error) {
       console.error("Error connecting to server:", error);
     }
   };
-
+  
+  
   return (
     <div className="max-w-md mx-auto mt-5 p-6 border border-gray-200 rounded-lg shadow-md bg-white">
       <h2 className="text-2xl font-bold text-center text-gray-800 mb-6">

@@ -51,6 +51,7 @@ const userSchema = new mongoose.Schema({
     }},
     about: {
       type: String,
+      required: false,
       default: "This is a default about me section.",
       minlength: [10, "About must be at least 10 characters long"],
       maxlength: [200, "About cannot exceed 200 characters"],

@@ -64,7 +64,7 @@ const Header = () => {
           <div className="relative w-full max-w-md">
             <button
               onClick={editProfile}
-              className="absolute top-2 right-2 text-gray-400 hover:text-white"
+              className="absolute top-2 right-2 text-gray-400 hover:text-white "
             >
               ✖
             </button>

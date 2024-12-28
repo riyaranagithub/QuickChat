@@ -8,34 +8,36 @@ const authRoutes = express.Router();
 // User Signup
 authRoutes.post("/signup", async (req, res) => {
   try {
-    console.log("Sign up data:", req.body); // Check form fields
-    console.log("Uploaded file:", req.file); // Check uploaded file data
+    const { username, email, password, about } = req.body;
+
+    if (!username || !email || !password) {
+      return res.status(400).send({ message: "All fields are required except 'about'." });
+    }
 
     // Hash password
-    const hashedPassword = await bcrypt.hash(req.body.password, 10);
+    const hashedPassword = await bcrypt.hash(password, 10);
 
-    // Create new user with hashed password and file path
+    // Replace empty 'about' with undefined to apply default
     const user = new User({
-      ...req.body,
+      username,
+      email,
       password: hashedPassword,
-     
+      about: about && about.trim() ? about : undefined,
     });
 
     await user.save();
     console.log("user id, signup", user._id);
 
-    // Generate JWT token for the newly created user
+    // Generate JWT token
     const token = user.getJwt();
 
-    // Send response with user and token
-    res
-      .status(200)
-      .send({ message: "Signup successful, user logged in", user, token });
+    res.status(200).send({ message: "Signup successful", user, token });
   } catch (error) {
     console.error("Error during signup:", error.message);
     res.status(400).send({ message: error.message });
   }
 });
+
 
 // User Login
 authRoutes.post("/login", async (req, res) => {
