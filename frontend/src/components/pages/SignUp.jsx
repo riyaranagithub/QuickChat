@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Link,useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 const SignUp = () => {
   const [formData, setFormData] = useState({
@@ -8,23 +8,13 @@ const SignUp = () => {
     password: "",
     about: "",
   });
-  const navigate=useNavigate()
-  const [profileImage, setProfileImage] = useState(null); // Store the selected image file
-  const [imagePreview, setImagePreview] = useState(null); // Preview of the selected image
+  const navigate = useNavigate();
   const [errors, setErrors] = useState({}); // Store field-specific errors
 
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
     setErrors((prev) => ({ ...prev, [name]: null })); // Clear error for the field being edited
-  };
-
-  const handleImageChange = (e) => {
-    const file = e.target.files[0];
-    if (file) {
-      setProfileImage(file);
-      setImagePreview(URL.createObjectURL(file)); // Create a preview URL for the image
-    }
   };
 
   const handleSubmit = async (e) => {
@@ -34,9 +24,7 @@ const SignUp = () => {
     formDataObj.append("email", formData.email);
     formDataObj.append("password", formData.password);
     formDataObj.append("about", formData.about);
-    if (profileImage) {
-      formDataObj.append("profileImage", profileImage); // Attach the image file
-    }
+
     for (let [key, value] of formDataObj.entries()) {
       console.log(`${key}:`, value);
     }
@@ -44,15 +32,14 @@ const SignUp = () => {
       const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/auth/signup`, {
         method: "POST",
         body: formDataObj,
-        credentials: "include" // Send FormData as the request body
+        credentials: "include", // Send FormData as the request body
       });
 
       const result = await response.json();
       console.log("Signup response:", result);
       if (response.ok) {
         console.log("Signup successful:", result);
-        navigate("/")
-        
+        navigate("/");
       } else {
         console.error("Signup error:", result.errors);
         setErrors(result.errors || {});
@@ -124,22 +111,6 @@ const SignUp = () => {
           />
           {errors.about && (
             <p className="text-red-500 text-sm mt-1">{errors.about}</p>
-          )}
-        </div>
-        <div>
-          <label className="block mb-2 text-gray-600">Profile Image (optional)</label>
-          <input
-            type="file"
-            accept="image/*"
-            onChange={handleImageChange}
-            className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-          />
-          {imagePreview && (
-            <img
-              src={imagePreview}
-              alt="Preview"
-              className="mt-4 w-20 h-20 rounded-full object-cover"
-            />
           )}
         </div>
         <button

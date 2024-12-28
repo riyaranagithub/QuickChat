@@ -1,14 +1,12 @@
 import express from "express";
 import {User} from '../models/user.js';
 import bcrypt from "bcrypt";
-import multer from "multer";
 import dotenv from "dotenv";
 
 dotenv.config();
 const authRoutes = express.Router();
-const upload = multer({ dest: process.env.UPLOAD_DIR });
 // User Signup
-authRoutes.post("/signup", upload.single("profileImage"), async (req, res) => {
+authRoutes.post("/signup", async (req, res) => {
   try {
     console.log("Sign up data:", req.body); // Check form fields
     console.log("Uploaded file:", req.file); // Check uploaded file data
@@ -20,7 +18,7 @@ authRoutes.post("/signup", upload.single("profileImage"), async (req, res) => {
     const user = new User({
       ...req.body,
       password: hashedPassword,
-      profileImage: req.file?.path, // Use `req.file.path` if file exists
+     
     });
 
     await user.save();
