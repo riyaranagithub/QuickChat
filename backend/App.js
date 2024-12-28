@@ -2,8 +2,6 @@ import express from "express";
 import { createServer } from "node:http";
 import { Server } from "socket.io";
 import connectDB from "./config/database.js";
-import path from "path";
-import { fileURLToPath } from "url";
 import cookieParser from "cookie-parser";
 import cors from "cors";
 import dotenv from "dotenv";
@@ -18,7 +16,7 @@ const app = express();
 const server = createServer(app); // Use Express app with HTTP server
 const io = new Server(server); // Initialize Socket.IO with HTTP server
 
-
+const port = process.env.PORT || 3000;
 
 // Parse incoming JSON and cookies
 app.use(express.json());
@@ -54,9 +52,6 @@ app.use("/auth", authRoutes);
 app.use("/profile", profileRoutes);
 app.use("/message", messageRoutes);
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-app.use(process.env.UPLOAD_DIR , express.static(path.join(__dirname, "uploads")));
 
 // --- Socket.IO Setup ---
 const activeUsers = new Map(); // Map to store userId and socketId
@@ -91,14 +86,11 @@ io.on("connection", (socket) => {
 });
 
 
-
-
-
 // --- Database Connection and Server Start ---
 connectDB()
   .then(() => {
     console.log("Database connected successfully");
-    server.listen(process.env.PORT, () => {
+    server.listen(port, () => {
       console.log("Server is running on port 3000");
       console.log("Frontend URL:", process.env.FRONTEND_URL);
 

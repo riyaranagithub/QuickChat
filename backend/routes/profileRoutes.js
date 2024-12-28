@@ -1,15 +1,13 @@
 import express from "express";
-import {User} from '../models/user.js';
-import userAuth from "../middleware/userAuth.js";
+import { User } from "../models/user.js";
+
 const profileRoutes = express.Router();
 
 // Protected Route
-profileRoutes.post("/profile",  async (req, res) => {
+profileRoutes.post("/profile", async (req, res) => {
   try {
     console.log("id", req.body);
-    const loggedUser = await User.findById(
-      req.body.userId
-    );
+    const loggedUser = await User.findById(req.body.userId);
     if (!loggedUser) return res.status(404).json({ message: "No user found" });
     res.status(200).json({ message: "User logged in", user: loggedUser });
   } catch (error) {
@@ -29,21 +27,22 @@ profileRoutes.get("/userall", async (req, res) => {
   }
 });
 
-//updateProfile
-
+// Update Profile (with image support)
 profileRoutes.put("/updateProfile", async (req, res) => {
-  console.log("Received PATCH request to update profile", req.body); // Log here
+  console.log("Received PUT request to update profile", req.body); // Log here
+
   const { _id, ...data } = req.body;
 
   try {
-    console.log("update data", req.body);
+    console.log("Update data:", data);
     const user = await User.findByIdAndUpdate(_id, data, { new: true });
     if (!user) return res.status(404).json({ error: "User not found" });
 
-    res.status(200).json({ message: "User updated", user });
+    // Respond with the updated user data
+    res.status(200).json({ message: "User updated successfully", user });
   } catch (error) {
     console.error("Error updating user:", error.message);
-    res.status(400).json({ error: "Error: User profile is not updated" });
+    res.status(400).json({ error: "Error: User profile could not be updated" });
   }
 });
 

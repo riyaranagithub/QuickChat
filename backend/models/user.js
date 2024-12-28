@@ -49,9 +49,6 @@ const userSchema = new mongoose.Schema({
       },
       message: "Invalid password format",
     }},
-    profileImage: {
-      type: String,
-    },
     about: {
       type: String,
       default: "This is a default about me section.",

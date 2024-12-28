@@ -23,8 +23,7 @@ function Home() {
   useEffect(() => {
     // Scroll to the bottom when the selected user changes
     scrollToBottom();
-  }, [selectedUserId, messages]);  // It will trigger whenever selectedUserId or messages change
-  
+  }, [selectedUserId, messages]); // It will trigger whenever selectedUserId or messages change
 
   useEffect(() => {
     // Fetch users and messages
@@ -149,17 +148,7 @@ function Home() {
                     selectedUserId === user._id ? "bg-blue-100" : ""
                   }`}
                 >
-                  {user.profileImage ? (
-                    <img
-                      src={`${import.meta.env.VITE_BACKEND_URL}/${
-                        user.profileImage
-                      }`}
-                      alt={user.username}
-                      className="w-8 h-8 rounded-full mr-3"
-                    />
-                  ) : (
-                    <FaUserCircle className="w-8 h-8 text-gray-400 mr-3" />
-                  )}
+                  <FaUserCircle className="w-8 h-8 text-gray-400 mr-3" />
                   {user.username}
                 </div>
               ))}
@@ -176,7 +165,6 @@ function Home() {
                 </h2>
               </div>
               <div className="flex-grow overflow-y-auto border border-gray-300 p-4 bg-gray-50 space-y-4">
-              
                 {messages
                   .filter(
                     (msg) =>

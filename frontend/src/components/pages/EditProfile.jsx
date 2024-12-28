@@ -1,46 +1,44 @@
 import React, { useEffect, useState } from "react";
-import { FaCamera, FaUserCircle } from "react-icons/fa";
-
+import { FaUserCircle } from "react-icons/fa";
 
 const EditProfile = () => {
   const [isEditing, setIsEditing] = useState(false);
   const [formData, setFormData] = useState({
-    _id:"",
+    _id: "",
     username: "",
     about: "",
-    profileImage: "",
     memberSince: "", // Added for account information
   });
   const [loading, setLoading] = useState(true);
-  const userId = sessionStorage.getItem('userId'); // Retrieve user ID
+  const userId = sessionStorage.getItem("userId"); // Retrieve user ID
+
   // Fetch profile data
   useEffect(() => {
     const fetchProfile = async () => {
       try {
-        const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/profile/profile`, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ userId }),
-          credentials: "include",
-        });
+        const response = await fetch(
+          `${import.meta.env.VITE_BACKEND_URL}/profile/profile`,
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ userId }),
+            credentials: "include",
+          }
+        );
 
         if (response.ok) {
           const data = await response.json();
-          console.log(data)
           const formattedDate = new Date(data.user.createdAt).toLocaleDateString(
-            "en-GB" // This is the format "DD/MM/YYYY"
+            "en-GB"
           );
-          const imageUrl = data.user.profileImage ? `${import.meta.env.BACKEND_URL}/${data.user.profileImage.replace(/\\/g, '/')}` : "";
-    
+
           setFormData({
-            _id:data.user._id||"",
+            _id: data.user._id || "",
             username: data.user.username || "",
             about: data.user.about || "",
-            profileImage: imageUrl || "",
             memberSince: formattedDate || "", // Populate join date
-
           });
         } else {
           console.error("Failed to fetch profile:", response.statusText);
@@ -69,36 +67,24 @@ const EditProfile = () => {
     setIsEditing((prev) => !prev);
   };
 
-  // Handle image upload
-  const handleImageUpload = (e) => {
-    const file = e.target.files[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onload = () => {
-        setFormData((prevData) => ({
-          ...prevData,
-          profileImage: reader.result,
-        }));
-      };
-      reader.readAsDataURL(file);
-    }
-  };
-
   // Handle form submission
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsEditing(false);
-    console.log("form data",formData)
+
     try {
-      const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/profile/updateProfile`, {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(formData),
-        credentials: "include",
-      });
-console.log("form data",formData)
+      const response = await fetch(
+        `${import.meta.env.VITE_BACKEND_URL}/profile/updateProfile`,
+        {
+          method: "PUT",
+          body: JSON.stringify(formData),
+          headers: {
+            "Content-Type": "application/json",
+          },
+          credentials: "include",
+        }
+      );
+
       if (response.ok) {
         const result = await response.json();
         console.log("Profile updated successfully", result);
@@ -140,42 +126,18 @@ console.log("form data",formData)
         </button>
       </div>
 
-      <form onSubmit={handleSubmit} className="space-y-4 text-black" >
-        {/* Profile Image */}
+      <form onSubmit={handleSubmit} className="space-y-4 text-black">
+        {/* User Icon */}
         <div className="relative flex flex-col items-center">
-          {formData.profileImage ? (
-            <img
-              src={formData.profileImage}
-              // alt="Profile"
-              className="w-24 h-24 rounded-full mb-2 border border-gray-300 object-cover"
-            />
-          ) : (
-            <FaUserCircle className="w-24 h-24 text-gray-400 mb-2" />
-          )}
-          {isEditing && (
-            <label
-              className=" bg-blue-500 p-2 rounded-full shadow-md cursor-pointer "
-            
-            >
-              <FaCamera className="text-white" />
-              <input
-                type="file"
-                accept="image/*"
-                onChange={handleImageUpload}
-                className="hidden"
-              />
-            </label>
-          )}
-          {isEditing && (
-            <p className="mt-4 text-sm text-gray-600">
-              Click the camera icon to update your image.
-            </p>
-          )}
+          <FaUserCircle className="w-24 h-24 text-gray-400 mb-2" />
         </div>
 
         {/* Username */}
         <div>
-          <label htmlFor="username" className="block text-sm font-medium text-white">
+          <label
+            htmlFor="username"
+            className="block text-sm font-medium text-white"
+          >
             Username
           </label>
           <input
@@ -193,7 +155,10 @@ console.log("form data",formData)
 
         {/* About */}
         <div>
-          <label htmlFor="about" className="block text-sm font-medium text-white">
+          <label
+            htmlFor="about"
+            className="block text-sm font-medium text-white"
+          >
             About
           </label>
           <textarea
