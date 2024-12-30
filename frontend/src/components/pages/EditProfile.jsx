@@ -88,6 +88,7 @@ const EditProfile = () => {
       if (response.ok) {
         const result = await response.json();
         console.log("Profile updated successfully", result);
+        alert("Profile updated successfully");
       } else {
         console.error("Update error:", response.statusText);
       }

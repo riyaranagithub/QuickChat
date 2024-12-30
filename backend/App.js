@@ -17,7 +17,7 @@ const server = createServer(app); // Use Express app with HTTP server
 const io = new Server(server, {
   cors: {
     origin: process.env.FRONTEND_URL, // Allow your frontend URL
-    methods: ["GET", "POST","PATCH","OPTIONS","DELETE"], // Specify allowed methods
+    methods: ["GET", "POST","PATCH","OPTIONS","DELETE","PUT"], // Specify allowed methods
     credentials: true, // Include cookies if necessary
   },
 });
@@ -34,7 +34,7 @@ app.options("*", (req, res) => {
   res.setHeader("Access-Control-Allow-Origin", process.env.FRONTEND_URL);
   res.setHeader(
     "Access-Control-Allow-Methods",
-    "GET, POST, PATCH, DELETE, OPTIONS"
+    "GET, POST, PATCH, DELETE, OPTIONS, PUT",
   );
   res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization");
   res.setHeader("Access-Control-Allow-Credentials", "true");
@@ -47,7 +47,7 @@ app.options("*", (req, res) => {
 app.use(
   cors({
     origin: process.env.FRONTEND_URL,
-    methods: ["GET", "POST", "PATCH", "DELETE", "OPTIONS"],
+    methods: ["GET", "POST", "PATCH", "DELETE", "OPTIONS","PUT"],
     allowedHeaders: ["Content-Type", "Authorization"],
     credentials: true,
   })
