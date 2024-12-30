@@ -17,7 +17,7 @@ const server = createServer(app); // Use Express app with HTTP server
 const io = new Server(server, {
   cors: {
     origin: process.env.FRONTEND_URL, // Allow your frontend URL
-    methods: ["GET", "POST","PATCH","OPTIONS","DELETE"], // Specify allowed methods
+    methods: ["GET", "POST","PATCH","OPTIONS","DELETE","PUT"], // Specify allowed methods
     credentials: true, // Include cookies if necessary
   },
 });
