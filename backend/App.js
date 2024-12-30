@@ -14,7 +14,13 @@ dotenv.config();
 
 const app = express();
 const server = createServer(app); // Use Express app with HTTP server
-const io = new Server(server); // Initialize Socket.IO with HTTP server
+const io = new Server(server, {
+  cors: {
+    origin: process.env.FRONTEND_URL, // Allow your frontend URL
+    methods: ["GET", "POST","PATCH","OPTIONS","DELETE"], // Specify allowed methods
+    credentials: true, // Include cookies if necessary
+  },
+});
 
 const port = process.env.PORT || 3000;
 
@@ -22,7 +28,7 @@ const port = process.env.PORT || 3000;
 app.use(express.json());
 app.use(cookieParser());
 // Explicitly handle OPTIONS requests
-app.options(process.env.FRONTEND_URL, (req, res) => {
+app.options("*", (req, res) => {
   console.log("Middleware running");
   console.log("Preflight request");
   res.setHeader("Access-Control-Allow-Origin", process.env.FRONTEND_URL);

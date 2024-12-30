@@ -102,36 +102,28 @@ const EditProfile = () => {
   }
 
   return (
-    <div className="p-4 border border-gray-300 rounded-lg shadow-md max-w-md mx-auto bg-gray-800">
-      <div className="flex items-center justify-between mb-4">
-        <h2 className="text-xl font-semibold text-white">Edit Profile</h2>
-        <div className="flex items-center">
-          <button
-            onClick={toggleEditMode}
-            className="text-gray-600 hover:text-blue-500 transition mr-2"
+    <div className="p-4 border border-gray-300 rounded-lg shadow-md max-w-md mx-auto bg-gray-800 font-Noto">
+      <div className="flex items-center mb-4">
+        <h2 className="text-xl font-semibold text-white mr-2">Edit Profile</h2>
+        <button
+          onClick={toggleEditMode}
+          className="text-gray-100 hover:text-blue-500 transition"
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+            strokeWidth="2"
+            stroke="currentColor"
+            className="w-6 h-6"
           >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 24 24"
-              strokeWidth="2"
-              stroke="currentColor"
-              className="w-6 h-6"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="M16.862 3.487a1.875 1.875 0 112.651 2.651L7.44 18.211l-4.095.455a.937.937 0 01-1.037-1.037l.455-4.095L16.862 3.487z"
-              />
-            </svg>
-          </button>
-          <span
-            onClick={toggleEditMode}
-            className="text-blue-500 cursor-pointer text-sm p-2"
-          >
-            {isEditing ? "Click to Save" : "Click to Edit"}
-          </span>
-        </div>
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              d="M16.862 3.487a1.875 1.875 0 112.651 2.651L7.44 18.211l-4.095.455a.937.937 0 01-1.037-1.037l.455-4.095L16.862 3.487z"
+            />
+          </svg>
+        </button>
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-4 text-black">
@@ -144,7 +136,7 @@ const EditProfile = () => {
         <div>
           <label
             htmlFor="username"
-            className="block text-sm font-medium text-white"
+            className="block text-lg font-medium text-white"
           >
             Username
           </label>
@@ -165,7 +157,7 @@ const EditProfile = () => {
         <div>
           <label
             htmlFor="about"
-            className="block text-sm font-medium text-white"
+            className="block text-lg font-medium text-white"
           >
             About
           </label>
@@ -184,7 +176,9 @@ const EditProfile = () => {
 
         {/* Account Information */}
         <div className="mt-4">
-          <h3 className="text-lg font-semibold mb-2 text-blue-500">Account Information</h3>
+          <h3 className="text-lg font-semibold mb-2 text-blue-500">
+            Account Information
+          </h3>
           <div className="flex justify-between items-center border-t border-gray-200 pt-2">
             <span className="text-white">Member Since</span>
             <span className="text-white">{formData.memberSince}</span>

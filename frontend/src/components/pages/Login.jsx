@@ -1,54 +1,35 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
-import { login } from "../../../store/userSlice"; // Make sure to import your login action
+import { login } from "../../../store/userSlice"; // Import your login action
 
 const Login = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
-
-  const [formData, setFormData] = useState({
-    email: "",
-    password: "",
-  });
+  const [formData, setFormData] = useState({ email: "", password: "" });
   const [errorMessage, setErrorMessage] = useState("");
 
-
   const handleSubmit = async (e) => {
-   
     e.preventDefault();
 
     try {
-      console.log("Backend URL:", import.meta.env.VITE_BACKEND_URL);
-      const loginResponse = await fetch(`${import.meta.env.VITE_BACKEND_URL}/auth/login`, {
+      const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/auth/login`, {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify(formData),
-        credentials: "include", // Ensure credentials are sent with the request
+        credentials: "include",
       });
 
-      const loginResult = await loginResponse.json();
-      console.log("Login Result:", loginResult);
-      if (loginResponse.status === 200) {
-        sessionStorage.setItem('userId', loginResult.user._id); // Store user ID
-        console.log('Login successful:', loginResult.message);
+      const result = await response.json();
+      if (response.ok) {
+        sessionStorage.setItem("userId", result.user._id);
+        dispatch(login(result.user));
+        navigate("/");
       } else {
-        setErrorMessage(loginResult.message || "Invalid login credentials");
-        console.log('Login failed:', data.message);
+        setErrorMessage(result.message || "Invalid login credentials");
       }
-
-  
-     
-      // If login is successful, dispatch the login action
-      dispatch(login(loginResult.user)); // Pass user data to the Redux store
-
-      // Navigate to the home page
-      navigate("/");
-
     } catch (error) {
-      console.error("Error during login.", error);
+      console.error("Login error:", error);
       setErrorMessage("An error occurred. Please try again.");
     }
   };
@@ -59,45 +40,57 @@ const Login = () => {
   };
 
   return (
-    <div className="max-w-md mx-auto mt-10 p-6 border border-gray-200 rounded-lg shadow-md bg-white">
-      <h2 className="text-2xl font-bold text-center text-gray-800 mb-6">
-        Log In to Your Account
-      </h2>
-      <form onSubmit={handleSubmit} className="space-y-4">
-        <input
-          type="email"
-          name="email"
-          placeholder="Email Address"
-          value={formData.email}
-          onChange={handleChange}
-          required
-          className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+    <div className="flex h-screen">
+            {/* Left Side - Image */}
+      <div className="w-1/2 h-full">
+        <img
+          src="login.png" // Replace with the actual image path
+          alt="Background"
+          className="object-cover w-full h-[50vh] md:h-full p-10 rounded-3xl" // Ensures the image is half screen on small screens and full on medium screens
         />
-        <input
-          type="password"
-          name="password"
-          placeholder="Password"
-          value={formData.password}
-          onChange={handleChange}
-          required
-          className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-        />
-        {errorMessage && (
-          <p className="text-red-500 text-sm mt-2">{errorMessage}</p>
-        )}
-        <button
-          type="submit"
-          className="w-full bg-blue-500 text-white p-3 rounded-lg font-semibold hover:bg-blue-600 transition-colors"
-        >
-          Log In
-        </button>
-      </form>
-      <p className="text-center mt-4 text-gray-600">
-        Don’t have an account?{" "}
-        <Link to="/signup" className="text-blue-500 font-medium hover:underline">
-          Sign Up
-        </Link>
-      </p>
+      </div>
+
+      {/* Right Side - Form */}
+      <div className="w-1/2 flex items-center justify-center bg-gray-100">
+        <div className="h-full p-6 bg-white rounded-lg shadow-md w-full">
+          <h2 className="text-2xl font-bold text-gray-800 text-center mb-6 font-Noto">
+            Log In to Your Account
+          </h2>
+          <form onSubmit={handleSubmit} className="space-y-10">
+            <input
+              type="email"
+              name="email"
+              placeholder="Email Address"
+              value={formData.email}
+              onChange={handleChange}
+              required
+              className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-gray-100"
+            />
+            <input
+              type="password"
+              name="password"
+              placeholder="Password"
+              value={formData.password}
+              onChange={handleChange}
+              required
+              className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-gray-100"
+            />
+            {errorMessage && <p className="text-red-500 text-sm">{errorMessage}</p>}
+            <button
+              type="submit"
+              className="w-full bg-blue-500 text-white p-3 rounded-lg hover:bg-blue-600 transition font-Noto"
+            >
+              Log In
+            </button>
+          </form>
+          <p className="text-center mt-4 text-gray-600 font-Noto">
+            Don’t have an account?{" "}
+            <Link to="/signup" className="text-blue-500 hover:underline">
+              Sign Up
+            </Link>
+          </p>
+        </div>
+      </div>
     </div>
   );
 };
