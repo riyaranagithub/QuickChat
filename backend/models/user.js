@@ -59,6 +59,11 @@ const userSchema = new mongoose.Schema({
   createdAt: {
     type: Date,
     default: Date.now, // Automatically sets the date when the document is created
+  },
+  status: {
+    type: String,
+    enum: ["online", "offline", "away"],
+    default: "offline",
   }
 });
 

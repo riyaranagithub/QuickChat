@@ -35,4 +35,16 @@ messageRoutes.get("/messageall", async (req, res) => {
     }
   });
 
+  messageRoutes.delete("/deletemessage/:id", async (req, res) => {
+    try {
+     const messageId = req.params.id;
+     if(!messageId){
+      console.log("Message id is required");
+     }
+     await Message.findByIdAndDelete(messageId);}
+    catch (error) {
+      res.status(400).send({ message: "Error deleting message" });
+    }
+  })
+
 export default messageRoutes;

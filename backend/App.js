@@ -8,16 +8,16 @@ import dotenv from "dotenv";
 import authRoutes from "./routes/authRoutes.js";
 import profileRoutes from "./routes/profileRoutes.js";
 import messageRoutes from "./routes/messageRoutes.js";
+import { User } from "./models/user.js";
 
 dotenv.config();
-
 
 const app = express();
 const server = createServer(app); // Use Express app with HTTP server
 const io = new Server(server, {
   cors: {
     origin: process.env.FRONTEND_URL, // Allow your frontend URL
-    methods: ["GET", "POST","PATCH","OPTIONS","DELETE","PUT"], // Specify allowed methods
+    methods: ["GET", "POST", "PATCH", "OPTIONS", "DELETE", "PUT"], // Specify allowed methods
     credentials: true, // Include cookies if necessary
   },
 });
@@ -28,26 +28,24 @@ const port = process.env.PORT || 3000;
 app.use(express.json());
 app.use(cookieParser());
 // Explicitly handle OPTIONS requests
-app.options("*", (req, res) => {
+app.options(process.env.FRONTEND_URL, (req, res) => {
   console.log("Middleware running");
   console.log("Preflight request");
   res.setHeader("Access-Control-Allow-Origin", process.env.FRONTEND_URL);
   res.setHeader(
     "Access-Control-Allow-Methods",
-    "GET, POST, PATCH, DELETE, OPTIONS, PUT",
+    "GET, POST, PATCH, DELETE, OPTIONS, PUT"
   );
   res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization");
   res.setHeader("Access-Control-Allow-Credentials", "true");
   res.status(200).send();
 });
 
-
-
 // Handle CORS
 app.use(
   cors({
     origin: process.env.FRONTEND_URL,
-    methods: ["GET", "POST", "PATCH", "DELETE", "OPTIONS","PUT"],
+    methods: ["GET", "POST", "PATCH", "DELETE", "OPTIONS", "PUT"],
     allowedHeaders: ["Content-Type", "Authorization"],
     credentials: true,
   })
@@ -58,48 +56,89 @@ app.use("/auth", authRoutes);
 app.use("/profile", profileRoutes);
 app.use("/message", messageRoutes);
 
-
 // --- Socket.IO Setup ---
-const activeUsers = new Map(); // Map to store userId and socketId
+const activeUsers = new Map();
 
 io.on("connection", (socket) => {
   console.log("A user connected", socket.id);
 
-  // Store userId and socketId when a user connects
   socket.on("register", (userId) => {
-    activeUsers.set(userId, socket.id);
-    console.log("Registered user:", userId, "Socket ID:", socket.id);
-  });
-
-  // Handle private messages
-  socket.on("private message", (msg) => {
-    const receiverSocketId = activeUsers.get(msg.receiverId);
-    if (receiverSocketId) {
-      io.to(receiverSocketId).emit("private message", msg);
+    if (!activeUsers.has(userId)) {
+      activeUsers.set(userId, { status: "online", socketId: socket.id });
+      console.log("Registered user:", userId, "Socket ID:", socket.id);
+      console.log(
+        "Active users after registration:",
+        Array.from(activeUsers.entries())
+      );
+    } else {
+      console.log("User already registered:", userId);
     }
   });
 
-  // Remove user from activeUsers when they disconnect
-  socket.on("disconnect", () => {
-    console.log("User disconnected", socket.id);
-    for (const [userId, socketId] of activeUsers.entries()) {
-      if (socketId === socket.id) {
-        activeUsers.delete(userId);
+  socket.on("private message", (msg) => {
+    const receiverUser = activeUsers.get(msg.receiverId);
+    if (receiverUser) {
+      console.log("Sending private message to:", msg.receiverId);
+      console.log("MESSAGE", msg);
+      io.to(receiverUser.socketId).emit("private message", msg);
+    } else {
+      console.log("Receiver socket ID not found for message:", msg);
+    }
+  });
+
+  socket.on("userOnline", async (userId) => {
+    try {
+      console.log("socketId", socket.id);
+      activeUsers.set(userId, { status: "online", socketId: socket.id });
+      console.log(`${userId} is online`);
+      await User.findByIdAndUpdate(userId, { status: "online" });
+      io.emit("userStatusUpdate", { userId, status: "online" });
+    } catch (err) {
+      console.error("Error updating user status to online:", err);
+    }
+  });
+
+  socket.on("disconnect", async () => {
+    console.log(`User disconnected with socket ID: ${socket.id}`);
+
+    let userIdToDelete = null;
+
+    // Find the user by their socket ID
+    for (const [userId, value] of activeUsers.entries()) {
+      if (value === socket.id || value.socketId === socket.id) {
+        userIdToDelete = userId;
         break;
       }
     }
+
+    if (userIdToDelete) {
+      try {
+        await User.findByIdAndUpdate(userIdToDelete, { status: "offline" });
+
+        // Notify other users about the status update
+        io.emit("userStatusUpdate", {
+          userId: userIdToDelete,
+          status: "offline",
+        });
+
+        // Remove the user from activeUsers
+        activeUsers.delete(userIdToDelete);
+        console.log(`User ${userIdToDelete} is now offline.`);
+      } catch (err) {
+        console.error("Error updating user status to offline:", err);
+      }
+    }
+
+    console.log("Updated active users:", Array.from(activeUsers.entries()));
   });
 });
 
-
-// --- Database Connection and Server Start ---
 connectDB()
   .then(() => {
     console.log("Database connected successfully");
     server.listen(port, () => {
       console.log("Server is running on port 3000");
       console.log("Frontend URL:", process.env.FRONTEND_URL);
-
     });
   })
   .catch((err) => {

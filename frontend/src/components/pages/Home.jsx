@@ -1,8 +1,7 @@
 import React, { useEffect, useState, useRef } from "react";
 import { io } from "socket.io-client";
-import { useNavigate } from "react-router-dom";
 import Header from "../Header";
-import { FaUserCircle } from "react-icons/fa";
+import { FaUserCircle,FaTrashAlt } from "react-icons/fa";
 
 function Home() {
   const [messages, setMessages] = useState([]);
@@ -13,6 +12,7 @@ function Home() {
   const userId = sessionStorage.getItem("userId");
   const socketRef = useRef(null);
   const messagesEndRef = useRef(null);
+  
 
   const scrollToBottom = () => {
     if (messagesEndRef.current) {
@@ -70,13 +70,23 @@ function Home() {
     fetchUsers();
     fetchMessages();
 
-    socketRef.current = io(import.meta.env.VITE_BACKEND_URL, { withCredentials: true });
+    socketRef.current = io(import.meta.env.VITE_BACKEND_URL, {
+      withCredentials: true,
+    });
+    socketRef.current.on("connect", () => console.log("Connected to server"));
     socketRef.current.emit("register", userId);
-
+    socketRef.current.emit("userOnline", userId);
     socketRef.current.on("private message", (msg) => {
+      console.log("Received private message:", msg); 
       setMessages((prev) => [...prev, msg]);
     });
 
+    socketRef.current.on("userStatusUpdate", (update) => {
+      console.log("User status update:", update);
+      // Update UI based on user status
+    });
+
+ 
     return () => {
       if (socketRef.current) {
         socketRef.current.off("private message");
@@ -118,6 +128,26 @@ function Home() {
     }
   };
 
+  const deleteMessage = async (msgId) => {
+    try {
+      const response = await fetch(
+        `${import.meta.env.VITE_BACKEND_URL}/message/deletemessage/${msgId}`,
+        {
+          method: "DELETE",
+          credentials: "include",
+        }
+      );
+      if (response.ok) {
+        setMessages((prev) => prev.filter((msg) => msg._id !== msgId));
+        alert("Message deleted successfully");
+      } else {
+        console.error("Failed to delete message");
+      }
+    } catch (error) {
+      console.error("Error deleting message:", error);
+    }
+  };
+
   const handleUserSelection = (user) => {
     setSelectedUserId(user._id);
     setSelectedUserDetails(user);
@@ -127,42 +157,69 @@ function Home() {
     <div className="flex flex-col h-screen">
       <Header />
       <div className="flex flex-grow overflow-hidden">
-        {/* Sidebar */}
-        <div className="w-64 bg-gray-100 dark:bg-gray-800 text-black dark:text-white p-4 border-r border-gray-300 h-full overflow-y-auto">
-          <h2 className="text-lg font-semibold mb-2">Users</h2>
-          <div className="space-y-2 font-Noto">
-            {users
-              .filter((user) => user._id !== userId)
-              .map((user) => (
-                <div
-                  key={user._id}
-                  onClick={() => handleUserSelection(user)}
-                  className={`flex p-2 border-b border-gray-300 cursor-pointer ${
-                    selectedUserId === user._id ? "bg-blue-100 dark:bg-blue-900" : ""
-                  }`}
-                >
-                  <FaUserCircle className="w-8 h-8 text-gray-400 dark:text-gray-200 mr-3" />
-                  {user.username}
-                </div>
-              ))}
+   {/* Sidebar */}
+<div className="w-64 bg-gray-100 dark:bg-gray-800 text-black dark:text-white p-4 border-r border-gray-300 h-full overflow-y-auto">
+  <h2 className="text-lg font-semibold mb-2">Users</h2>
+  <div className="space-y-2 font-Noto">
+    {users
+      .filter((user) => user._id !== userId)
+      .map((user) => (
+        <div
+          key={user._id}
+          onClick={() => handleUserSelection(user)}
+          className={`flex items-center justify-between p-2 border-b border-gray-300 cursor-pointer ${
+            selectedUserId === user._id ? "bg-blue-100 dark:bg-blue-900" : ""
+          }`}
+        >
+          {/* Username and Status */}
+          <div className="flex justify-between w-full">
+            <div className="flex items-center gap-2">
+                 <FaUserCircle className="w-8 h-8 text-gray-400 dark:text-gray-200 " />
+            <span className="text-black dark:text-white">{user.username}</span>
+            </div>
+       
+            <span
+              className={`text-xs font-medium px-2 py-1 rounded-lg ${
+                user.status === "online" ? "bg-green-100 text-green-600" : "bg-gray-200 text-gray-600"
+              }`}
+            >
+              {user.status === "online" ? "Online" : "Offline"}
+            </span>
           </div>
         </div>
+      ))}
+  </div>
+</div>
+
 
         {/* Chat Area */}
         <div className="flex-grow p-6 flex flex-col justify-center  overflow-hidden bg-gray-50 dark:bg-gray-900">
           {selectedUserId ? (
             <>
-              <div className="border-b border-gray-300 dark:border-gray-700 pb-2 mb-4">
-                <h2 className="text-xl font-semibold text-black dark:text-white">
-                  {selectedUserDetails.username}
-                </h2>
-              </div>
-              <div className="flex-grow overflow-y-auto border border-gray-300 dark:border-gray-700 p-4 space-y-4 font-Noto">
+            <div className="border-b border-gray-300 dark:border-gray-700 pb-2 mb-4 flex items-center justify-between">
+  <h2 className="text-xl font-semibold text-black dark:text-white flex items-center gap-2">
+    {selectedUserDetails.username}
+    {/* Status Indicator */}
+    <span
+      className={`text-sm font-medium px-2 py-1 rounded-lg ${
+        selectedUserDetails.status === "online"
+          ? "bg-green-100 text-green-600"
+          : "bg-gray-200 text-gray-600"
+      }`}
+    >
+      {selectedUserDetails.status === "online" ? "Online" : "Offline"}
+    </span>
+  </h2>
+</div>
+
+<div className="flex-grow overflow-y-auto border border-gray-300 dark:border-gray-700 p-4 space-y-4 font-Noto">
                 {messages
                   .filter(
                     (msg) =>
-                      (msg.senderId === userId && msg.receiverId === selectedUserId) ||
-                      (msg.receiverId === userId && msg.senderId === selectedUserId)
+                      (msg.senderId === userId &&
+                        msg.receiverId === selectedUserId) ||
+                      (msg.receiverId === userId &&
+                        msg.senderId === selectedUserId)
                   )
                   .sort((a, b) => new Date(a.timestamp) - new Date(b.timestamp))
                   .map((msg, index) => (
@@ -172,30 +229,44 @@ function Home() {
                         msg.senderId === userId ? "flex-row-reverse" : ""
                       }`}
                     >
-                      <div>
-                        <p
-                          className={`font-semibold mr-2 ${
-                            msg.senderId === userId
-                              ? "text-green-600 dark:text-green-400"
-                              : "text-blue-600 dark:text-blue-400"
-                          }`}
-                        >
-                          {msg.senderId === userId ? "You" : selectedUserDetails.username}:
-                        </p>
-                        <p
-                          className={`p-2 rounded-lg shadow-md ${
-                            msg.senderId === userId
-                              ? "bg-blue-100 dark:bg-gray-400 "
-                              : "bg-gray-100 dark:bg-gray-600"
-                          }`}
-                        >
-                          {msg.content}
-                        </p>
+                      <div className="flex items-center gap-2">
+                        {msg.senderId !== userId && (
+                          <FaTrashAlt
+                            className="text-red-500 cursor-pointer"
+                            onClick={() => deleteMessage(msg._id)}
+                          />
+                        )}
+                        <div>
+                          <p
+                            className={`font-semibold mr-2 ${
+                              msg.senderId === userId
+                                ? "text-green-600 dark:text-green-400"
+                                : "text-blue-600 dark:text-blue-400"
+                            }`}
+                          >
+                            {msg.senderId === userId ? "You" : selectedUserDetails.username}
+                          </p>
+                          <p
+                            className={`p-2 rounded-lg shadow-md ${
+                              msg.senderId === userId
+                                ? "bg-blue-100 dark:bg-gray-300 "
+                                : "bg-gray-100 dark:bg-gray-300"
+                            }`}
+                          >
+                            {msg.content}
+                          </p>
+                        </div>
+                        {msg.senderId === userId && (
+                          <FaTrashAlt
+                            className="text-red-500 cursor-pointer"
+                            onClick={() => deleteMessage(msg._id)}
+                          />
+                        )}
                       </div>
                     </div>
-                  ))}
-                <div ref={messagesEndRef} />
-              </div>
+                       ))}
+                       <div ref={messagesEndRef} />
+                     </div>
               <div className="mt-4 flex gap-2">
                 <input
                   type="text"
@@ -219,7 +290,9 @@ function Home() {
                 alt="Start Chatting Placeholder"
                 className="object-contain h-2/3 w-2/3"
               />
-              <h2 className="text-2xl font-semibold mb-4">Select a user to start chatting</h2>
+              <h2 className="text-2xl font-semibold mb-4">
+                Select a user to start chatting
+              </h2>
             </div>
           )}
         </div>

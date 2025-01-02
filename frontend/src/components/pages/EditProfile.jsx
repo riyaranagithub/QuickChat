@@ -2,15 +2,19 @@ import React, { useEffect, useState } from "react";
 import { FaUserCircle } from "react-icons/fa";
 
 const EditProfile = () => {
-  const [isEditing, setIsEditing] = useState(false);
+  const [isEditing, setIsEditing] = useState({
+    username: false,
+    about: false,
+  });
   const [formData, setFormData] = useState({
     _id: "",
     username: "",
+    email: "",
     about: "",
-    memberSince: "", // Added for account information
+    memberSince: "",
   });
   const [loading, setLoading] = useState(true);
-  const userId = sessionStorage.getItem("userId"); // Retrieve user ID
+  const userId = sessionStorage.getItem("userId");
 
   // Fetch profile data
   useEffect(() => {
@@ -37,8 +41,9 @@ const EditProfile = () => {
           setFormData({
             _id: data.user._id || "",
             username: data.user.username || "",
+            email: data.user.email || "",
             about: data.user.about || "",
-            memberSince: formattedDate || "", // Populate join date
+            memberSince: formattedDate || "",
           });
         } else {
           console.error("Failed to fetch profile:", response.statusText);
@@ -62,15 +67,19 @@ const EditProfile = () => {
     }));
   };
 
-  // Toggle edit mode
-  const toggleEditMode = () => {
-    setIsEditing((prev) => !prev);
+  // Enable editing mode for a specific field
+  const enableEditMode = (field) => {
+    setIsEditing((prev) => ({ ...prev, [field]: true }));
+  };
+
+  // Disable editing after blur (optional, can be removed if not needed)
+  const handleBlur = (field) => {
+    setIsEditing((prev) => ({ ...prev, [field]: false }));
   };
 
   // Handle form submission
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setIsEditing(false);
 
     try {
       const response = await fetch(
@@ -84,11 +93,12 @@ const EditProfile = () => {
           credentials: "include",
         }
       );
-
+console.log("response", response);
       if (response.ok) {
         const result = await response.json();
         console.log("Profile updated successfully", result);
         alert("Profile updated successfully");
+        setIsEditing({ username: false, about: false });
       } else {
         console.error("Update error:", response.statusText);
       }
@@ -105,32 +115,31 @@ const EditProfile = () => {
   return (
     <div className="p-4 border border-gray-300 rounded-lg shadow-md max-w-md mx-auto bg-gray-800 font-Noto">
       <div className="flex items-center mb-4">
-        <h2 className="text-xl font-semibold text-white mr-2">Edit Profile</h2>
-        <button
-          onClick={toggleEditMode}
-          className="text-gray-100 hover:text-blue-500 transition"
-        >
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            fill="none"
-            viewBox="0 0 24 24"
-            strokeWidth="2"
-            stroke="currentColor"
-            className="w-6 h-6"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              d="M16.862 3.487a1.875 1.875 0 112.651 2.651L7.44 18.211l-4.095.455a.937.937 0 01-1.037-1.037l.455-4.095L16.862 3.487z"
-            />
-          </svg>
-        </button>
+        <h2 className="text-xl font-semibold text-white">Edit Profile</h2>
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-4 text-black">
         {/* User Icon */}
         <div className="relative flex flex-col items-center">
-          <FaUserCircle className="w-24 h-24 text-gray-400 mb-2" />
+          <FaUserCircle className="w-20 h-20 text-gray-400 " />
+        </div>
+
+        {/* Email */}
+        <div>
+          <label
+            htmlFor="email"
+            className="block text-lg font-medium text-white"
+          >
+            Email
+          </label>
+          <input
+            type="email"
+            id="email"
+            name="email"
+            value={formData.email}
+            disabled
+            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2 bg-gray-100"
+          />
         </div>
 
         {/* Username */}
@@ -147,9 +156,10 @@ const EditProfile = () => {
             name="username"
             value={formData.username}
             onChange={handleInputChange}
-            disabled={!isEditing}
+            onClick={() => enableEditMode("username")}
+            onBlur={() => handleBlur("username")}
             className={`mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2 ${
-              isEditing ? "bg-white" : "bg-gray-100"
+              isEditing.username ? "bg-white" : "bg-gray-100"
             }`}
           />
         </div>
@@ -167,11 +177,12 @@ const EditProfile = () => {
             name="about"
             value={formData.about}
             onChange={handleInputChange}
-            disabled={!isEditing}
+            onClick={() => enableEditMode("about")}
+            onBlur={() => handleBlur("about")}
             className={`mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2 ${
-              isEditing ? "bg-white" : "bg-gray-100"
+              isEditing.about ? "bg-white" : "bg-gray-100"
             }`}
-            rows="4"
+            rows="3"
           />
         </div>
 
@@ -186,15 +197,15 @@ const EditProfile = () => {
           </div>
         </div>
 
-        {/* Save Button */}
-        {isEditing && (
+        {/* Update Button */}
+    
           <button
             type="submit"
             className="w-full bg-blue-500 text-white rounded-lg py-2 hover:bg-blue-600 transition"
           >
-            Save Changes
+            Update
           </button>
-        )}
+        
       </form>
     </div>
   );
