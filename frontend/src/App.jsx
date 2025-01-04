@@ -1,15 +1,14 @@
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-import { Navigate } from "react-router-dom";
-import Home from "./components/pages/Home"
+import Home from "./components/pages/Home";
 import Channel from "./components/pages/Channel";
 import Login from "./components/pages/Login";
 import SignUp from "./components/pages/SignUp";
 import Header from "./components/Header";
 import EditProfile from "./components/pages/EditProfile";
+import ProtectedRoute from "../store/ProtectedRoute";
+import { Navigate } from "react-router-dom";
 
 const App = () => {
-  const isLoggedIn = sessionStorage.getItem("userId") !== null; // Check login status from sessionStorage
-
   return (
     <Router>
       <Header />
@@ -19,22 +18,36 @@ const App = () => {
         <Route path="/signup" element={<SignUp />} />
 
         {/* Protected Routes */}
-        {isLoggedIn ? (
-          <>
-            <Route path="/home" element={<Home />} />
-            <Route path="/channel" element={<Channel />} />
-            <Route path="/profile" element={<EditProfile />} />
-          </>
-        ) : (
-          <Route path="/" element={<Navigate to="/login" />} /> // Redirect non-logged-in users to login
-        )}
+        <Route
+          path="/home"
+          element={
+            <ProtectedRoute>
+              <Home />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/channel"
+          element={
+            <ProtectedRoute>
+              <Channel />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/profile"
+          element={
+            <ProtectedRoute>
+              <EditProfile />
+            </ProtectedRoute>
+          }
+        />
 
-        {/* Catch-all Route */}
-        <Route path="*" element={<Navigate to={isLoggedIn ? "/home" : "/login"} />} /> {/* Fallback route */}
+        {/* Fallback Route */}
+        <Route path="*" element={<Navigate to="/home" replace />} />
       </Routes>
     </Router>
   );
 };
-
 
 export default App;

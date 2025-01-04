@@ -131,7 +131,7 @@ function Home() {
   };
 
   return (
-    <div className="flex flex-col h-500 mt-16">
+    <div className="flex flex-col h-screen-minus-4rem mt-16">
       <div className="flex flex-grow overflow-hidden">
         {/* Sidebar */}
         <div className="w-64 bg-gray-100 dark:bg-gray-800 text-black dark:text-white p-4 border-r border-gray-300 h-full overflow-y-auto">

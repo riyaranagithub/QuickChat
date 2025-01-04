@@ -10,7 +10,7 @@ export default {
         Noto:["Noto Sans KR", "serif"] // Add your Google Font
       },
       height: {
-        '500': '535px',
+        'screen-minus-4rem': 'calc(100vh - 4rem)', 
       },
     },
   },

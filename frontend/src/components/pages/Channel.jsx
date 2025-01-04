@@ -136,9 +136,9 @@ const Channel = () => {
   };
 
   return (
-    <div className="flex h-500 dark:bg-gray-900 text-white bg-white  mt-16">
+    <div className="flex h-screen-minus-4rem dark:bg-gray-900 text-white bg-white  mt-16">
       {/* Sidebar */}
-      <div className="w-1/4 dark:bg-gray-800 bg-gray-100 p-4">
+      <div className="w-1/4 dark:bg-gray-800 bg-gray-100 p-4 border border-r-2">
         <h2 className="text-lg font-bold mb-4 font-Noto text-black dark:text-white">
           Channels
         </h2>
