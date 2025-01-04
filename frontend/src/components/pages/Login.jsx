@@ -13,18 +13,23 @@ const Login = () => {
     e.preventDefault();
 
     try {
-      const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/auth/login`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(formData),
-        credentials: "include",
-      });
+      const response = await fetch(
+        `${import.meta.env.VITE_BACKEND_URL}/auth/login`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(formData),
+          credentials: "include",
+        }
+      );
 
       const result = await response.json();
       if (response.ok) {
         sessionStorage.setItem("userId", result.user._id);
+        sessionStorage.setItem("username", result.user.username);
         dispatch(login(result.user));
-        navigate("/");
+        navigate("/home");
+        console.log("Navigation to home page");
       } else {
         setErrorMessage(result.message || "Invalid login credentials");
       }
@@ -40,8 +45,8 @@ const Login = () => {
   };
 
   return (
-    <div className="flex h-screen">
-            {/* Left Side - Image */}
+    <div className="flex h-500 mt-16">
+      {/* Left Side - Image */}
       <div className="w-1/2 h-full">
         <img
           src="login.png" // Replace with the actual image path
@@ -75,7 +80,9 @@ const Login = () => {
               required
               className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-gray-100"
             />
-            {errorMessage && <p className="text-red-500 text-sm">{errorMessage}</p>}
+            {errorMessage && (
+              <p className="text-red-500 text-sm">{errorMessage}</p>
+            )}
             <button
               type="submit"
               className="w-full bg-blue-500 text-white p-3 rounded-lg hover:bg-blue-600 transition font-Noto"

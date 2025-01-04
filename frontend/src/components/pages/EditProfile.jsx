@@ -34,9 +34,9 @@ const EditProfile = () => {
 
         if (response.ok) {
           const data = await response.json();
-          const formattedDate = new Date(data.user.createdAt).toLocaleDateString(
-            "en-GB"
-          );
+          const formattedDate = new Date(
+            data.user.createdAt
+          ).toLocaleDateString("en-GB");
 
           setFormData({
             _id: data.user._id || "",
@@ -93,7 +93,7 @@ const EditProfile = () => {
           credentials: "include",
         }
       );
-console.log("response", response);
+      console.log("response", response);
       if (response.ok) {
         const result = await response.json();
         console.log("Profile updated successfully", result);
@@ -198,14 +198,13 @@ console.log("response", response);
         </div>
 
         {/* Update Button */}
-    
-          <button
-            type="submit"
-            className="w-full bg-blue-500 text-white rounded-lg py-2 hover:bg-blue-600 transition"
-          >
-            Update
-          </button>
-        
+
+        <button
+          type="submit"
+          className="w-full bg-blue-500 text-white rounded-lg py-2 hover:bg-blue-600 transition"
+        >
+          Update
+        </button>
       </form>
     </div>
   );

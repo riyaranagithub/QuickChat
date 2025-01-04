@@ -19,30 +19,34 @@ const SignUp = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-  
+
     const { about, ...otherFields } = formData;
-  
+
     // Prepare payload, excluding empty 'about'
     const payload = {
       ...otherFields,
       ...(about && about.trim() ? { about } : {}),
     };
-  
+
     try {
-      const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/auth/signup`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(payload),
-        credentials: "include",
-      });
-  
+      const response = await fetch(
+        `${import.meta.env.VITE_BACKEND_URL}/auth/signup`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(payload),
+          credentials: "include",
+        }
+      );
+
       const result = await response.json();
       console.log("Signup response:", result);
-  
+
       if (response.ok) {
         sessionStorage.setItem("userId", result.user._id);
+        sessionStorage.setItem("username", result.user.username);
         console.log("Signup successful:", result);
         navigate("/");
       } else {
@@ -53,10 +57,9 @@ const SignUp = () => {
       console.error("Error connecting to server:", error);
     }
   };
-  
-  
+
   return (
-    <div className="max-w-md mx-auto mt-5 p-6 border border-gray-200 rounded-lg shadow-md bg-white">
+    <div className="max-w-md mx-auto mt-16 p-6 border border-gray-200 rounded-lg shadow-md bg-white">
       <h2 className="text-2xl font-bold text-center text-gray-800 mb-6">
         Create an Account
       </h2>
@@ -129,10 +132,7 @@ const SignUp = () => {
 
       <p className="text-center mt-4 text-gray-600">
         Already have an account?{" "}
-        <Link
-          to="/login"
-          className="text-blue-500 font-medium hover:underline"
-        >
+        <Link to="/login" className="text-blue-500 font-medium hover:underline">
           Log In
         </Link>
       </p>

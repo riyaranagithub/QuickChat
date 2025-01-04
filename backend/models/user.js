@@ -87,7 +87,73 @@ const messageSchema = new mongoose.Schema({
 });
 
 
+const channelSchema = new mongoose.Schema(
+  {
+    name: {
+      type: String,
+      required: true,
+      unique: true, // Ensure no duplicate channel names
+      trim: true,
+    },
+    description: {
+      type: String,
+      trim: true,
+      default: "",
+    },
+    createdBy: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User", // Reference to User model
+      required: true,
+    },
+    members: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "User", // Reference to User model
+      },
+    ],
+    createdAt: {
+      type: Date,
+      default: Date.now,
+    },
+  },
+  { timestamps: true } // Automatically adds createdAt and updatedAt
+);
+
+
+const channelMessageSchema = new mongoose.Schema(
+  {
+    channelId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Channel", // Reference to Channel model
+      required: true,
+    },
+    senderId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User", // Reference to User model
+      required: true,
+    },
+    senderName:{
+      type: String,
+      required: true,
+      trim: true,
+    },
+    content: {
+      type: String,
+      required: true,
+      trim: true,
+    },
+    createdAt: {
+      type: Date,
+      default: Date.now,
+    },
+  },
+  { timestamps: true } // Automatically adds createdAt and updatedAt
+);
+
+
 
 const User = mongoose.model('User', userSchema);
 const Message = mongoose.model('Message', messageSchema);
-export {User,Message}
+const Channel = mongoose.model('Channel', channelSchema);
+const ChannelMessage = mongoose.model('ChannelMessage', channelMessageSchema);
+export {User,Message,Channel,ChannelMessage};

@@ -8,6 +8,7 @@ import dotenv from "dotenv";
 import authRoutes from "./routes/authRoutes.js";
 import profileRoutes from "./routes/profileRoutes.js";
 import messageRoutes from "./routes/messageRoutes.js";
+import channelRoutes from "./routes/channelRoutes.js"
 import { User } from "./models/user.js";
 
 dotenv.config();
@@ -55,6 +56,7 @@ app.use(
 app.use("/auth", authRoutes);
 app.use("/profile", profileRoutes);
 app.use("/message", messageRoutes);
+app.use("/channel",channelRoutes)
 
 // --- Socket.IO Setup ---
 const activeUsers = new Map();
@@ -97,6 +99,23 @@ io.on("connection", (socket) => {
       console.error("Error updating user status to online:", err);
     }
   });
+
+  // Join a specific channel
+  socket.on("joinChannel", (channelId) => {
+    socket.join(channelId);
+    console.log(`User joined channel: ${channelId}`);
+  });
+
+  // Leave a channel
+  socket.on("leaveChannel", (channelId) => {
+    socket.leave(channelId);
+    console.log(`User left channel: ${channelId}`);
+  });
+ 
+    // Emit new messages to everyone in the channel
+    socket.on("sendMessage", (message) => {
+      io.to(message.channelId).emit("message", message); // Emit to specific channel room
+    });
 
   socket.on("disconnect", async () => {
     console.log(`User disconnected with socket ID: ${socket.id}`);

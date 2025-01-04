@@ -9,6 +9,9 @@ export default {
         Rubik: ["Rubik Vinyl"," serif"],
         Noto:["Noto Sans KR", "serif"] // Add your Google Font
       },
+      height: {
+        '500': '535px',
+      },
     },
   },
   plugins: [],
