@@ -26,6 +26,7 @@ const Login = () => {
 
       const result = await response.json();
       if (response.ok) {
+
         sessionStorage.setItem("userId", result.user._id);
         sessionStorage.setItem("username", result.user.username);
         dispatch(login(result.user));
