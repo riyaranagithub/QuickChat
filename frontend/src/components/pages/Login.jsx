@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import { login } from "../../../store/userSlice"; // Import your login action
+import Particle from "../particle/Particle";
 
 const Login = () => {
   const dispatch = useDispatch();
@@ -29,7 +30,6 @@ const Login = () => {
         sessionStorage.setItem("username", result.user.username);
         dispatch(login(result.user));
         navigate("/home");
-        console.log("Navigation to home page");
       } else {
         setErrorMessage(result.message || "Invalid login credentials");
       }
@@ -45,23 +45,17 @@ const Login = () => {
   };
 
   return (
-    <div className="flex h-screen-minus-4rem mt-16">
-      {/* Left Side - Image */}
-      <div className="w-1/2 h-full">
-        <img
-          src="login.png" // Replace with the actual image path
-          alt="Background"
-          className="object-cover w-full h-[50vh] md:h-full p-10 rounded-3xl" // Ensures the image is half screen on small screens and full on medium screens
-        />
+    <div className="relative flex justify-center items-center min-h-screen">
+      {/* Particles Background */}
+      <div className="absolute top-0 left-0 w-full h-full z-[-1]">
+        <Particle />
       </div>
-
-      {/* Right Side - Form */}
-      <div className="w-1/2 flex items-center justify-center bg-gray-100">
-        <div className="h-full p-6 bg-white rounded-lg shadow-md w-full">
-          <h2 className="text-2xl font-bold text-gray-800 text-center mb-6 font-Noto">
+      <div className="relative z-10 w-4/5 sm:w-3/4 md:w-1/2 lg:w-1/4 flex items-center justify-center bg-gray-100 px-4 py-6 sm:px-6 rounded-lg shadow-lg">
+        <div className="w-full">
+          <h2 className="text-xl sm:text-2xl font-bold text-gray-800 text-center mb-6 font-Noto">
             Log In to Your Account
           </h2>
-          <form onSubmit={handleSubmit} className="space-y-10">
+          <form onSubmit={handleSubmit} className="space-y-6">
             <input
               type="email"
               name="email"
@@ -69,7 +63,7 @@ const Login = () => {
               value={formData.email}
               onChange={handleChange}
               required
-              className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-gray-100"
+              className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-gray-100 text-sm sm:text-base"
             />
             <input
               type="password"
@@ -78,7 +72,7 @@ const Login = () => {
               value={formData.password}
               onChange={handleChange}
               required
-              className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-gray-100"
+              className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-gray-100 text-sm sm:text-base"
             />
             {errorMessage && (
               <p className="text-red-500 text-sm">{errorMessage}</p>
@@ -90,7 +84,7 @@ const Login = () => {
               Log In
             </button>
           </form>
-          <p className="text-center mt-4 text-gray-600 font-Noto">
+          <p className="text-center mt-4 text-gray-600 font-Noto text-sm sm:text-base">
             Don’t have an account?{" "}
             <Link to="/signup" className="text-blue-500 hover:underline">
               Sign Up
