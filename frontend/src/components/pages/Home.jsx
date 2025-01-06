@@ -8,6 +8,7 @@ function Home() {
   const [users, setUsers] = useState([]);
   const [selectedUserId, setSelectedUserId] = useState(null);
   const [selectedUserDetails, setSelectedUserDetails] = useState(null);
+  const [isChatView, setIsChatView] = useState(false);
   const userId = sessionStorage.getItem("userId");
   const socketRef = useRef(null);
   const messagesEndRef = useRef(null);
@@ -128,13 +129,15 @@ function Home() {
   const handleUserSelection = (user) => {
     setSelectedUserId(user._id);
     setSelectedUserDetails(user);
+    setIsChatView(true);
   };
+  console.log(isChatView)
 
   return (
     <div className="flex flex-col h-screen-minus-4rem mt-16">
       <div className="flex flex-grow overflow-hidden">
         {/* Sidebar */}
-        <div className="w-64 bg-gray-100 dark:bg-gray-800 text-black dark:text-white p-4 border-r border-gray-300 h-full overflow-y-auto">
+        <div className={`w-2/5 bg-gray-100 dark:bg-gray-800 text-black dark:text-white p-4 border-r border-gray-300 h-full overflow-y-auto  max-sm:w-full max-sm:h-full max-sm:fixed  `}>
           <h2 className="text-lg font-semibold mb-2">Users</h2>
           <div className="space-y-2 font-Noto">
             {users
@@ -176,10 +179,21 @@ function Home() {
         </div>
 
         {/* Chat Area */}
-        <div className="flex-grow p-6 flex flex-col justify-center  overflow-hidden bg-gray-50 dark:bg-gray-900">
+        <div
+  className={`flex-grow p-6 flex flex-col justify-center overflow-hidden bg-gray-50 dark:bg-gray-900 
+    ${isChatView || 'max-sm' ? 'w-full' : ''} 
+    ${isChatView ? 'max-sm:w-full max-sm:h-full max-sm:fixed max-sm:top-0 max-sm:left-0 max-sm:bg-white max-sm:z-50' : ''}`}
+>
           {selectedUserId ? (
             <>
               <div className="border-b border-gray-300 dark:border-gray-700 pb-2 mb-4 flex items-center justify-between">
+                 {/* Go Back Button for Smaller Screens */}
+              <button
+                className="block sm:hidden text-gray-700 dark:text-white mr-4"
+                onClick={() => setIsChatView(false)}
+              >
+                ← Go Back
+              </button>
                 <h2 className="text-xl font-semibold text-black dark:text-white flex items-center gap-2">
                   {selectedUserDetails.username}
                   {/* Status Indicator */}

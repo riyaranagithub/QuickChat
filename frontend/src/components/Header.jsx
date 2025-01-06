@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { FaCog, FaUser, FaSignOutAlt, FaMoon, FaSun } from "react-icons/fa";
+import { HiMenu, HiX } from "react-icons/hi"; // Import hamburger and close icons
 import EditProfile from "./pages/EditProfile";
 import { logout } from "../../store/userSlice";
 import { useDispatch } from "react-redux";
@@ -14,6 +15,7 @@ const Header = () => {
   const [darkMode, setDarkMode] = useState(
     localStorage.getItem("theme") === "dark"
   );
+  const [menuOpen, setMenuOpen] = useState(false); // State for hamburger menu
 
   useEffect(() => {
     if (darkMode) {
@@ -26,16 +28,12 @@ const Header = () => {
   }, [darkMode]);
 
   const toggleDarkMode = () => setDarkMode((prev) => !prev);
-
-  const editProfile = () => {
-    setShowEditProfile((prev) => !prev);
-  };
+  const toggleMenu = () => setMenuOpen((prev) => !prev); // Toggle menu visibility
+  const editProfile = () => setShowEditProfile((prev) => !prev);
 
   const handleLogout = async () => {
     const confirmLogout = window.confirm("Are you sure you want to log out?");
-    if (!confirmLogout) {
-      return;
-    }
+    if (!confirmLogout) return;
 
     try {
       sessionStorage.removeItem("userToken");
@@ -48,85 +46,96 @@ const Header = () => {
     }
   };
 
-  // Check if user is logged in based on sessionStorage
   const isLoggedIn = sessionStorage.getItem("userId") !== null;
 
   return (
-    <header className="fixed top-0 left-0 w-full flex justify-between items-center p-4 bg-black text-white drop-shadow-2xl z-50">
-      {/* Logo and Heading */}
+    <header className="fixed top-0 left-0 w-full flex justify-between items-center p-4 bg-black text-white shadow-lg z-50">
+      {/* Logo */}
       <div className="flex items-center space-x-4">
         <img src="/logo.png" alt="Quick Chat Logo" className="h-10 w-auto" />
-        <h1 className="text-2xl font-semibold font-Rubik">Quick Chat</h1>
+        <h1 className="text-2xl font-semibold">Quick Chat</h1>
       </div>
 
-      {/* Navigation and Controls */}
-      <div className="flex space-x-6 items-center">
-        <button
-          onClick={toggleDarkMode}
-          className="flex items-center p-2 rounded-lg hover:bg-gray-700 transition"
-          aria-label="Toggle Dark Mode"
-        >
-          {darkMode ? (
-            <FaSun className="text-yellow-500" />
-          ) : (
-            <FaMoon className="text-gray-300" />
-          )}
-        </button>
+      {/* Hamburger Menu Button */}
+      <button
+        onClick={toggleMenu}
+        className="md:hidden text-white p-2 focus:outline-none"
+        aria-label="Toggle Menu"
+      >
+        {menuOpen ? <HiX size={24} /> : <HiMenu size={24} />}
+      </button>
 
-        {/* Conditional Navigation Links */}
+      {/* Navigation Links */}
+      <nav
+        className={`${
+          menuOpen ? "block" : "hidden"
+        } absolute top-full left-0 w-full bg-black md:static md:w-auto md:flex md:space-x-6 md:bg-transparent`}
+      >
         {isLoggedIn && (
           <>
             <Link
               to="/home"
-              className="flex items-center cursor-pointer hover:text-gray-400"
+              className="block px-4 py-2 text-center md:inline hover:text-gray-400"
+              onClick={() => setMenuOpen(false)}
             >
-              <span>Home</span>
+              Home
             </Link>
             <Link
               to="/channel"
-              className="flex items-center cursor-pointer hover:text-gray-400"
+              className="block px-4 py-2 text-center md:inline hover:text-gray-400"
+              onClick={() => setMenuOpen(false)}
             >
-              <span>Channels</span>
+              Channels
             </Link>
           </>
         )}
-
-        {/* Profile and Logout Links */}
+        <button
+          onClick={toggleDarkMode}
+          className="block px-4 py-2 text-center md:inline hover:bg-gray-700 rounded-lg"
+          aria-label="Toggle Dark Mode"
+        >
+          {darkMode ? <FaSun className="text-yellow-500" /> : <FaMoon />}
+        </button>
         {isLoggedIn && (
-          <div
-            className="flex items-center cursor-pointer hover:text-gray-400"
-            onClick={editProfile}
-          >
-            <FaUser className="mr-2" />
-            <span>Profile</span>
-          </div>
-        )}
-        {isLoggedIn && (
-          <div
-            className="flex items-center cursor-pointer hover:text-gray-400"
-            onClick={handleLogout}
-          >
-            <FaSignOutAlt className="mr-2" />
-            <span>Logout</span>
-          </div>
-        )}
-      </div>
-
-      {showEditProfile && (
-        <div className="fixed inset-0 bg-gray-900 bg-opacity-50 flex justify-center z-50">
-          <div className="relative w-full max-w-md">
-            <button
+          <>
+            <div
+              className="block px-4 py-2 text-center md:inline hover:text-gray-400"
               onClick={editProfile}
-              className="absolute top-2 right-2 text-gray-400 hover:text-white"
             >
-              ✖
-            </button>
-            <EditProfile />
-          </div>
-        </div>
-      )}
+              <FaUser className="inline mr-2" />
+              Profile
+            </div>
+            <div
+              className="block px-4 py-2 text-center md:inline hover:text-gray-400"
+              onClick={handleLogout}
+            >
+              <FaSignOutAlt className="inline mr-2" />
+              Logout
+            </div>
+          </>
+        )}
+      </nav>
+
+      {/* Edit Profile Modal */}
+      {showEditProfile && (
+  <div className="fixed inset-0 bg-gray-900 bg-opacity-50 flex justify-center items-center z-50">
+    <div
+      className="relative w-full max-w-md max-h-[90vh] bg-white rounded-lg shadow-lg p-1"
+      style={{ marginTop: "2rem", marginBottom: "2rem" }}
+    >
+      <button
+        onClick={editProfile}
+        className="absolute top-2 right-2 text-gray-500 hover:text-black"
+      >
+        ✖
+      </button>
+      <EditProfile />
+    </div>
+  </div>
+)}
+
     </header>
   );
-};
+}
 
 export default Header;

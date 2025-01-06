@@ -113,16 +113,14 @@ const EditProfile = () => {
   }
 
   return (
-    <div className="p-4 border border-gray-300 rounded-lg shadow-md max-w-md mx-auto bg-gray-800 font-Noto">
+    <div className="p-4 border border-gray-300 rounded-lg shadow-md max-w-md  mx-auto bg-gray-800 font-Noto ">
       <div className="flex items-center mb-4">
         <h2 className="text-xl font-semibold text-white">Edit Profile</h2>
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-4 text-black">
         {/* User Icon */}
-        <div className="relative flex flex-col items-center">
-          <FaUserCircle className="w-20 h-20 text-gray-400 " />
-        </div>
+       
 
         {/* Email */}
         <div>
