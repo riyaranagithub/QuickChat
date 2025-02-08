@@ -89,15 +89,16 @@ const Header = () => {
             </Link>
           </>
         )}
-        <button
+        
+        {isLoggedIn && (
+          <>
+          <button
           onClick={toggleDarkMode}
           className="block px-4 py-2 text-center md:inline hover:bg-gray-700 rounded-lg"
           aria-label="Toggle Dark Mode"
         >
           {darkMode ? <FaSun className="text-yellow-500" /> : <FaMoon />}
         </button>
-        {isLoggedIn && (
-          <>
             <div
               className="block px-4 py-2 text-center md:inline hover:text-gray-400"
               onClick={editProfile}
