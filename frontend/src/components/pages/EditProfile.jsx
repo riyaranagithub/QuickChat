@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from "react";
-import { FaUserCircle } from "react-icons/fa";
 
-const EditProfile = () => {
+const EditProfile = ({setShowEditProfile}) => {
   const [isEditing, setIsEditing] = useState({
     username: false,
     about: false,
@@ -105,6 +104,9 @@ const EditProfile = () => {
     } catch (error) {
       console.error("Something went wrong", error);
       alert("Something went wrong. Please try again.");
+    }
+    finally{
+           setShowEditProfile (false)
     }
   };
 

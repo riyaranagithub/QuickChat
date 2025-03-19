@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { FaCog, FaUser, FaSignOutAlt, FaMoon, FaSun } from "react-icons/fa";
+import {FaUser, FaSignOutAlt, FaMoon, FaSun } from "react-icons/fa";
 import { HiMenu, HiX } from "react-icons/hi"; // Import hamburger and close icons
 import EditProfile from "./pages/EditProfile";
 import { logout } from "../../store/userSlice";
@@ -130,7 +130,7 @@ const Header = () => {
       >
         ✖
       </button>
-      <EditProfile />
+      <EditProfile setShowEditProfile = {setShowEditProfile} />
     </div>
   </div>
 )}

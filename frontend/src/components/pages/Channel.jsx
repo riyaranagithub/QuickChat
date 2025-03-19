@@ -1,17 +1,15 @@
 import React, { useState, useEffect, useRef } from "react";
 import { FaPlus, FaChevronDown, FaPaperPlane } from "react-icons/fa";
-import Picker from "emoji-picker-react"; // Install: npm install emoji-picker-react
 import io from "socket.io-client"; // Import Socket.IO client
 
 const Channel = () => {
   const [channels, setChannels] = useState([]);
   const [selectedChannel, setSelectedChannel] = useState(null);
-  const [showChannels, setShowChannels] = useState(false);
+  const [showChannels, setShowChannels] = useState(true);
   const [newMessage, setNewMessage] = useState("");
   const [messages, setMessages] = useState([]);
   const messagesEndRef = useRef(null);
 
-  const [showEmojiPicker, setShowEmojiPicker] = useState(false);
   const [showCreateChannelModal, setShowCreateChannelModal] = useState(false);
   const [newChannel, setNewChannel] = useState({ name: "", description: "" });
   const userId = sessionStorage.getItem("userId");
